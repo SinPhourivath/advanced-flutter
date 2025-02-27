@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
- 
+
 import '../../../model/ride/locations.dart';
 import '../../../model/ride_pref/ride_pref.dart';
- 
+import '../../../theme/theme.dart';
+import '../../../utils/date_time_util.dart';
+import '../../../widgets/display/bla_divider.dart';
+import './ride_pref_tile.dart';
+
 ///
 /// A Ride Preference From is a view to select:
 ///   - A depcarture location
@@ -28,8 +32,6 @@ class _RidePrefFormState extends State<RidePrefForm> {
   Location? arrival;
   late int requestedSeats;
 
-
-
   // ----------------------------------
   // Initialize the Form attributes
   // ----------------------------------
@@ -37,18 +39,32 @@ class _RidePrefFormState extends State<RidePrefForm> {
   @override
   void initState() {
     super.initState();
-    // TODO 
+    if (widget.initRidePref != null) {
+      departure = widget.initRidePref!.departure;
+      arrival = widget.initRidePref!.arrival;
+      departureDate = widget.initRidePref!.departureDate;
+      requestedSeats = widget.initRidePref!.requestedSeats;
+    } else {
+      departure = null; // User must select both departure and arrival locations
+      arrival = null;
+      departureDate = DateTime.now(); // Default: today
+      requestedSeats = 1; // Default: 1 seat
+    }
   }
 
   // ----------------------------------
   // Handle events
   // ----------------------------------
- 
 
   // ----------------------------------
   // Compute the widgets rendering
   // ----------------------------------
-  
+  String get departureLabel =>
+      departure != null ? departure!.name : "Leaving from";
+  String get arrivalLabel => arrival != null ? arrival!.name : "Going to";
+
+  String get dateLabel => DateTimeUtils.formatDateTime(departureDate);
+  String get seatLabel => requestedSeats.toString();
 
   // ----------------------------------
   // Build the widgets
@@ -58,8 +74,54 @@ class _RidePrefFormState extends State<RidePrefForm> {
     return Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [ 
- 
+        children: [
+          RidePrefTile(
+            text: departureLabel,
+            leadingIcon: Icons.circle_outlined,
+            onPressed: () {},
+            trailingIconButton: IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.swap_vert),
+            ),
+          ),
+          const BlaDivider(horizontalPadding: BlaSpacings.xl),
+          RidePrefTile(
+              text: arrivalLabel,
+              leadingIcon: Icons.circle_outlined,
+              onPressed: () {}),
+          const BlaDivider(horizontalPadding: BlaSpacings.xl),
+          RidePrefTile(
+              text: dateLabel,
+              leadingIcon: Icons.calendar_month_outlined,
+              onPressed: () {}),
+          const BlaDivider(horizontalPadding: BlaSpacings.xl),
+          RidePrefTile(
+              text: seatLabel,
+              leadingIcon: Icons.person_outline,
+              onPressed: () {}),
+          // Bla button is not used here becuase it doesn't fit correctly
+          TextButton(
+            onPressed: () {},
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: BlaSpacings.m),
+              decoration: BoxDecoration(
+                color: BlaColors.primary,
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(BlaSpacings.radius),
+                ),
+              ),
+              child: Text(
+                "Search",
+                style: BlaTextStyles.button.copyWith(color: BlaColors.white),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          )
         ]);
   }
 }
