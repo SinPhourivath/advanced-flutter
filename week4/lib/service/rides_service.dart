@@ -1,6 +1,6 @@
 import 'package:week4/model/ride_pref/ride_pref.dart';
+import 'package:week4/repository/ride_repository.dart';
 
-import '../dummy_data/dummy_data.dart';
 import '../model/ride/ride.dart';
 
 ////
@@ -8,17 +8,37 @@ import '../model/ride/ride.dart';
 ///   - The list of available rides
 ///
 class RidesService {
+  static RidesService? _instance;
 
-  static List<Ride> availableRides = fakeRides;  
+  final RideRepository repository;
 
+  RidesService._internal(this.repository);
+
+  static void initialize(RideRepository repository) {
+    if (_instance == null) {
+      _instance = RidesService._internal(repository);
+    } else {
+      throw Exception("RidesService is already initialized");
+    }
+  }
+
+  static RidesService get instance {
+    if (_instance == null) {
+      throw Exception("RidesService is not initialized. Use initalize() first");
+    }
+    return _instance!;
+  }
 
   ///
   ///  Return the relevant rides, given the passenger preferences
   ///
-  static List<Ride> getRidesFor(RidePreference preferences) {
- 
-    // For now, just a test
-    return availableRides.where( (ride) => ride.departureLocation == preferences.departure && ride.arrivalLocation == preferences.arrival).toList();
+  List<Ride> getRidesFor(RidePreference preferences, RideFilter? filter) {
+    return repository.getRides(preferences, filter);
   }
- 
+}
+
+class RideFilter {
+  bool acceptPets;
+
+  RideFilter({required this.acceptPets});
 }

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:week4/screens/rides/widgets/ride_pref_bar.dart';
- 
-import '../../dummy_data/dummy_data.dart';
+import 'package:week4/screens/rides/widgets/ride_pref_modal.dart';
+
 import '../../model/ride/ride.dart';
 import '../../model/ride_pref/ride_pref.dart';
+import '../../service/ride_prefs_service.dart';
 import '../../service/rides_service.dart';
 import '../../theme/theme.dart';
- 
+
+import '../../utils/animations_util.dart';
 import 'widgets/rides_tile.dart';
 
 ///
@@ -21,25 +23,39 @@ class RidesScreen extends StatefulWidget {
 }
 
 class _RidesScreenState extends State<RidesScreen> {
- 
-  RidePreference currentPreference  = fakeRidePrefs[0];   // TODO 1 :  We should get it from the service
+  RidePreference get currentPreference =>
+      RidePrefService.instance.currentPreference!;
 
-  List<Ride> get matchingRides => RidesService.getRidesFor(currentPreference);
+  // // Kind of work with below setState
+  // RidePreference currentPreference =
+  //     RidePrefService.instance.currentPreference!;
+
+  List<Ride> get matchingRides => RidesService.instance
+      .getRidesFor(currentPreference, null); // TODO: No filter yet
 
   void onBackPressed() {
-    Navigator.of(context).pop();     //  Back to the previous view
-  } 
+    Navigator.of(context).pop(); //  Back to the previous view
+  }
 
   void onPreferencePressed() async {
-        // TODO  6 : we should push the modal with the current pref
+    RidePreference? newPreference = await Navigator.of(context).push(
+        AnimationUtils.createBottomToTopRoute(
+            RidePrefModal(initialPreference: currentPreference)));
 
-        // TODO 9 :  After pop, we should get the new current pref from the modal 
+    if (newPreference != null) {
+      RidePrefService.instance.setCurrentPreference(newPreference);
+      setState(() {});
+    }
 
-        // TODO 10 :  Then we should update the service current pref,   and update the view
+    // // If I create currentPreference as computed property
+    // if (newPreference != null) {
+    //   setState(() {
+    //     currentPreference = newPreference;
+    //   });
+    // }
   }
 
-  void onFilterPressed() {
-  }
+  void onFilterPressed() {}
 
   @override
   Widget build(BuildContext context) {
