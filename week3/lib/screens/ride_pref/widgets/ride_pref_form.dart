@@ -5,6 +5,7 @@ import '../../../model/ride_pref/ride_pref.dart';
 import '../../../theme/theme.dart';
 import '../../../utils/date_time_util.dart';
 import '../../../widgets/display/bla_divider.dart';
+import '../../../widgets/inputs/bla_location_picker.dart';
 import './ride_pref_tile.dart';
 
 ///
@@ -55,6 +56,42 @@ class _RidePrefFormState extends State<RidePrefForm> {
   // ----------------------------------
   // Handle events
   // ----------------------------------
+  void onDeparturePressed() async {
+    // Wait for BlaLocationPicker
+    Location? selectedLocation = await Navigator.of(context).push<Location>(
+        MaterialPageRoute(builder: (ctx) => BlaLocationPicker()));
+
+    // Update departure location
+    if (selectedLocation != null) {
+      setState(() {
+        departure = selectedLocation;
+      });
+    }
+  }
+
+  void onArrivalPressed() async {
+    // Wait for BlaLocationPicker
+    Location? selectedLocation = await Navigator.of(context).push<Location>(
+        MaterialPageRoute(builder: (ctx) => BlaLocationPicker()));
+
+    // Update arrival location
+    if (selectedLocation != null) {
+      setState(() {
+        arrival = selectedLocation;
+      });
+    }
+  }
+
+  void onSwapLocationPressed() {
+    // Allow swapping only if both locations are selected
+    if (departure != null && arrival != null) {
+      Location tmp = departure!;
+      setState(() {
+        departure = arrival;
+        arrival = tmp;
+      });
+    }
+  }
 
   // ----------------------------------
   // Compute the widgets rendering
@@ -78,9 +115,9 @@ class _RidePrefFormState extends State<RidePrefForm> {
           RidePrefTile(
             text: departureLabel,
             leadingIcon: Icons.circle_outlined,
-            onPressed: () {},
+            onPressed: onDeparturePressed,
             trailingIconButton: IconButton(
-              onPressed: () {},
+              onPressed: onSwapLocationPressed,
               icon: Icon(Icons.swap_vert),
             ),
           ),
@@ -88,7 +125,7 @@ class _RidePrefFormState extends State<RidePrefForm> {
           RidePrefTile(
               text: arrivalLabel,
               leadingIcon: Icons.circle_outlined,
-              onPressed: () {}),
+              onPressed: onArrivalPressed),
           const BlaDivider(horizontalPadding: BlaSpacings.xl),
           RidePrefTile(
               text: dateLabel,
@@ -101,10 +138,12 @@ class _RidePrefFormState extends State<RidePrefForm> {
               onPressed: () {}),
           // Bla button is not used here becuase it doesn't fit correctly
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              print("Search button pressed!");
+            },
             style: TextButton.styleFrom(
               padding: EdgeInsets.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              // tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             child: Container(
               width: double.infinity,
@@ -121,7 +160,7 @@ class _RidePrefFormState extends State<RidePrefForm> {
                 textAlign: TextAlign.center,
               ),
             ),
-          )
+          ),
         ]);
   }
 }

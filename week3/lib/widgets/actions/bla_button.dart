@@ -18,13 +18,33 @@ class BlaButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Compute the button style
+    Color backgroundColor = isPrimary ? BlaColors.primary : BlaColors.white;
+    Color foregroundColor = isPrimary ? BlaColors.white : BlaColors.primary;
+    BorderSide? boarder =
+        isPrimary ? null : BorderSide(color: BlaColors.greyLight);
+
+    // Create icon​ inside button if it is provided
+    final List<Widget> buttonChildren = [];
+
+    if (iconData != null) {
+      buttonChildren.add(
+        Icon(iconData,
+            // Using height make the icon size more on par with the text
+            // Alternative fontSize is too small
+            size: BlaTextStyles.button.height,
+            color: foregroundColor),
+      );
+      buttonChildren.add(SizedBox(width: BlaSpacings.s));
+    }
+
     return SizedBox(
       width: double.infinity,
       child: TextButton(
         style: TextButton.styleFrom(
-          backgroundColor: isPrimary ? BlaColors.primary : BlaColors.white,
-          foregroundColor: isPrimary ? BlaColors.white : BlaColors.primary,
-          side: isPrimary ? null : BorderSide(color: BlaColors.greyLight),
+          backgroundColor: backgroundColor,
+          foregroundColor: foregroundColor,
+          side: boarder,
           padding: EdgeInsets.symmetric(
             vertical: BlaSpacings.m,
           ),
@@ -36,14 +56,7 @@ class BlaButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (iconData != null) ...[
-              Icon(iconData,
-                  // Using height make the icon size more on par with the text
-                  // Alternative fontSize is too small
-                  size: BlaTextStyles.button.height,
-                  color: isPrimary ? BlaColors.white : BlaColors.primary),
-              SizedBox(width: BlaSpacings.s),
-            ],
+            ...buttonChildren,
             Text(text, style: BlaTextStyles.button),
           ],
         ),
